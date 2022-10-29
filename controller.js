@@ -1,19 +1,35 @@
-const data = require('./data');
-const {db} = data;
+//aqui se hace toda la logica
+const {userData} = require('./data');
 
 const getUserData = async (req, res) => {
     try{
-        const {userData : {id}} = req;
-        const usersDB = db.collection('users').doc(id);
-        const {userData: { fullName: {firstName,lastName, maidenName}, age, email, address, jobTitle} } = await usersDB.get();
-        /* console.log("response:",response); */
+        //req tiene body y params
+        const {params : {id}} = req;
+
+        //x-lambda funcion, se ejecuta n numero de veces
+       const currentUser = userData.find(x => x.id === id)
+        
+        const {
+            firstName,
+            lastName, 
+            maidenName, 
+            age, 
+            email, 
+            address, 
+        } = currentUser;
+
+//teniamos que ver los datos de bd y ver los datos que necesitamos
+//template string``-ingresar codigo dentro
+
         res.send({
             status: 200,
-            fullName: user.fullName,
-            age: user.age,
-            email: user.email,
-            adress: user.address,
-            jobTitle: user.jobTitle
+            user: {
+                fullName: `${firstName} ${lastName} ${maidenName}`,
+                age,
+                email,
+                address,
+                jobTitle: company.title
+            }
         });
     } catch (error) {
         res.send(error);
@@ -23,15 +39,13 @@ const getUserData = async (req, res) => {
 
 const updateUserAddress = async(req,res) => {
     try {
-        const {userData : {id}} = req;
-        //const { id, time, author, name, rating } = movie;
-        //const moviesDB = db.collection('movies').doc(id);
-       const resp = await usersDB.update({
-        //name, time, rating, author
-       });
+        const {params : {id}, body: newAddress} = req;
+       const currentUser = userData.find(x => x.id === id)
+       const user = {...currentUser, address: newAddress} //sobrescribe
+       
        res.send({
         status: 200,
-        id
+        user
        });
     } catch (error) {
         res.send(error)
@@ -43,3 +57,5 @@ module.exports = {
     getUserData, updateUserAddress
 }
 
+//crear una nueva rama "perdon"
+//checkout - hace una copia de todo lo wue esta en la rama en donde estas
